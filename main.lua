@@ -43,6 +43,7 @@ local oSprite = love.graphics.newImage('graphics/o.png')
 -- fonts
 local retroFont = love.graphics.newFont('fonts/pressstart.ttf', 8)
 
+
 --[[ data structures ]]
 local grid = {
 	{"", "", ""},
@@ -120,13 +121,14 @@ end
 
 
 function drawGrid()
-	-- calculate margins
+	--[[ calculate margins ]]
 	local xMargin = VIRTUAL_WIDTH - (GRID_TILE_SIZE * GRID_WIDTH)
 	local yMargin =  VIRTUAL_HEIGHT - (GRID_TILE_SIZE * GRID_HEIGHT)
 
-	-- set line width
+	--[[ set line width ]]
 	love.graphics.setLineWidth(2)
 	
+
 	--[[ draw lines of the grid ]]	
 	-- vertical lines
 	love.graphics.line(xMargin/2 + GRID_TILE_SIZE, yMargin/2,
@@ -142,7 +144,7 @@ function drawGrid()
 	love.graphics.line(xMargin/2, VIRTUAL_HEIGHT - yMargin/2 - GRID_TILE_SIZE,
 		VIRTUAL_WIDTH - xMargin/2, VIRTUAL_HEIGHT - yMargin/2 - GRID_TILE_SIZE)
 	
-	-- draw the sprites within the lines
+	--[[ draw the sprites within the lines ]]
 	for y = 1, GRID_HEIGHT do
 		for x = 1, GRID_WIDTH do
 			local xOffset = xMargin/2 + GRID_TILE_SIZE * (x - 1)
