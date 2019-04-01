@@ -1,15 +1,22 @@
 --[[ 
-	Tic Tac Toe
+	Tic Tac Toe Game
 
 	Author: Fábio Moreira
 	fa.moreira23@gmail.com
+
+	"based on Colden Ogdsen 
+	CS50 twitch.tv/cs50tv "
+	cogden@cs50.harvard.edu
+
+	sprites drawned with aseprite software
+	https://www.aseprite.org/
 ]]
 
 --[[ libraries ]]
 local push = require 'lib/push'
 
---[[ Contants ]]
 
+--[[ Contants ]]
 -- virtual resolution to simulate gameboy advance
 VIRTUAL_WIDTH = 256
 VIRTUAL_HEIGHT = 144
@@ -18,15 +25,22 @@ VIRTUAL_HEIGHT = 144
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
+-- grid size
 GRID_HEIGHT, GRID_WIDTH = 3, 3
 
+-- grid tile size
 GRID_TILE_SIZE = 40
 
+-- sprite padding
 SPRITE_PADDING = 4
+
+
 --[[ assets ]]
+-- sprites
 local xSprite = love.graphics.newImage('graphics/x.png')
 local oSprite = love.graphics.newImage('graphics/o.png')
 
+-- fonts
 local retroFont = love.graphics.newFont('fonts/pressstart.ttf', 8)
 
 --[[ data structures ]]
@@ -35,15 +49,18 @@ local grid = {
 	{"", "", ""},
 	{"", "", ""}
 }
-
 local currentPlayer = 1
 local selectedX, selectedY = 1, 1
+
 
 function love.load()
 	-- remove smoothness from rendering, giving a more aesthethic retro aspect
 	love.graphics.setDefaultFilter('nearest','nearest')
+
+	-- fonts to be loaded
 	love.graphics.setFont(retroFont)
 
+	-- window game title
 	love.window.setTitle('TicTacToe')
 
 	-- setup  game screen based on virtual resolution
@@ -53,6 +70,7 @@ function love.load()
 		resizable = false
 	}) 
 end
+
 
 function love.keypressed(key)
 	if key == 'escape' then
@@ -92,6 +110,7 @@ function love.update(dt)
 
 end
 
+
 function love.draw()
 	push:start()
 	drawGrid()
@@ -99,15 +118,16 @@ function love.draw()
 	push:finish()
 end
 
+
 function drawGrid()
 	-- calculate margins
 	local xMargin = VIRTUAL_WIDTH - (GRID_TILE_SIZE * GRID_WIDTH)
 	local yMargin =  VIRTUAL_HEIGHT - (GRID_TILE_SIZE * GRID_HEIGHT)
 
+	-- set line width
 	love.graphics.setLineWidth(2)
 	
-	--[[ draw lines of the grid ]]
-	
+	--[[ draw lines of the grid ]]	
 	-- vertical lines
 	love.graphics.line(xMargin/2 + GRID_TILE_SIZE, yMargin/2,
 		xMargin/2 + GRID_TILE_SIZE, VIRTUAL_HEIGHT - yMargin/2)
@@ -130,13 +150,14 @@ function drawGrid()
 			if grid[y][x] == "" then
 				-- draw nothing
 			elseif grid [y][x] == "X" then
-				-- draw X sprite at x * y location
+				-- draw "X" sprite at x * y location
 				love.graphics.draw(xSprite, xOffset + SPRITE_PADDING, yOffset + SPRITE_PADDING)
 			else
-				-- draw O sprite at x * Y location
+				-- draw "O" sprite at x * Y location
 				love.graphics.draw(oSprite, xOffset + SPRITE_PADDING, yOffset + SPRITE_PADDING)
 			end
 			if x == selectedX and y == selectedY then
+				-- overlays selected tile
 				love.graphics.setColor(1, 1, 1, 0.5)
 				love.graphics.rectangle('fill', xOffset, yOffset, GRID_TILE_SIZE, GRID_TILE_SIZE)
 				love.graphics.setColor(1, 1, 1, 1)
