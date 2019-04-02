@@ -52,6 +52,8 @@ local grid = {
 }
 local currentPlayer = 1
 local selectedX, selectedY = 1, 1
+local winningPlayer = 0
+local gameOver = false
 
 
 function love.load()
@@ -78,30 +80,34 @@ function love.keypressed(key)
 		love.event.quit()
 	end
 
-	if key == 'left' or key == 'a'then
-		if selectedX > 1 then
-			selectedX = selectedX - 1
-		end
-	elseif key == 'right' or key == 'd' then
-		if selectedX < 3 then
-			selectedX = selectedX + 1
-		end
-	elseif key == 'up'or key == 'w' then
-		if selectedY > 1 then
-			selectedY = selectedY - 1
-		end
-	elseif key == 'down' or key == 's' then
-		if selectedY < 3 then
-			selectedY = selectedY + 1
-		end
-	elseif key == 'space' or key == 'enter' then
-		if grid[selectedY][selectedX] == "" then
-			if currentPlayer == 1 then
-				grid[selectedY][selectedX] = 'X'
-				currentPlayer = 2
-			else
-				grid[selectedY][selectedX] = 'O'
-				currentPlayer = 1
+	if not gameOver then
+		if key == 'left' or key == 'a'then
+			if selectedX > 1 then
+				selectedX = selectedX - 1
+			end
+		elseif key == 'right' or key == 'd' then
+			if selectedX < 3 then
+				selectedX = selectedX + 1
+			end
+		elseif key == 'up'or key == 'w' then
+			if selectedY > 1 then
+				selectedY = selectedY - 1
+			end
+		elseif key == 'down' or key == 's' then
+			if selectedY < 3 then
+				selectedY = selectedY + 1
+			end
+		elseif key == 'space' or key == 'enter' then
+			if grid[selectedY][selectedX] == "" then
+				if currentPlayer == 1 then
+					grid[selectedY][selectedX] = 'X'
+					currentPlayer = 2
+					checkVictory()
+				else
+					grid[selectedY][selectedX] = 'O'
+					currentPlayer = 1
+					checkVictory()
+				end
 			end
 		end
 	end
@@ -115,7 +121,11 @@ end
 function love.draw()
 	push:start()
 	drawGrid()
-	love.graphics.print('Player ' .. currentPlayer .. "'s turn", 1, 1)
+	if gameOver then
+		love.graphics.print('Player ' .. winningPlayer .. ' wins!', 1, 1)
+	else
+		love.graphics.print('Player ' .. currentPlayer .. "'s turn", 1, 1) 
+	end
 	push:finish()
 end
 
@@ -164,6 +174,110 @@ function drawGrid()
 				love.graphics.rectangle('fill', xOffset, yOffset, GRID_TILE_SIZE, GRID_TILE_SIZE)
 				love.graphics.setColor(1, 1, 1, 1)
 			end
+		end
+	end
+end
+
+function checkVictory()
+		
+	checkHorizontals()
+	checkVerticals()
+	checkDiagonals()
+
+end
+
+function checkHorizontals()
+
+	--[[ check Y horizontal rows ]]
+	for y = 1, GRID_HEIGHT do
+		local win = true
+		local firstCharacter = grid[y][1]
+
+		if firstCharacter == "" then
+			goto continue
+		end
+
+		for x = 2, GRID_WIDTH do
+			if grid[y][x] ~= firstCharacter then
+				goto continue
+			end
+		end
+		
+		gameOver = true
+		winningPlayer = firstCharacter == "X" and 1 or 2
+		::continue::
+	end
+end
+
+function checkVerticals()
+	
+	--[[ check X vertical columns ]]
+	for x = 1, GRID_WIDTH do
+		local win = true
+		local firstCharacter = grid[1][x]
+
+		if firstCharacter == "" then
+			goto continue
+		end
+
+		for y = 2, GRID_HEIGHT do
+			if grid[y][x] ~= firstCharacter then
+				goto continue
+			end
+		end
+		
+		gameOver = true
+		winningPlayer = firstCharacter == "X" and 1 or 2
+		::continue::
+	end
+end
+
+function checkDiagonals()
+
+	--[[ check 2 diagonal rows ]]
+	local firstCharacter = grid[1][1]
+
+	-- from top left to bottom right
+	local match = true
+	 
+	if firstCharacter == "" then
+		-- do nothing
+	else
+		for diagonal = 1, GRID_HEIGHT do
+			if grid[diagonal][diagonal] ~= firstCharacter then
+				match = false
+				break
+			end
+		end
+
+		if match then
+			gameOver = true
+			winningPlayer = firstCharacter == "X" and 1 or 2
+		end
+	end
+
+	-- from bottom left to top right
+	local match = true
+	firstCharacter = grid[GRID_HEIGHT][1]
+
+	if firstCharacter == "" then
+		-- do nothing
+	else
+		local x, y = 2, 2
+
+		for i = 1, GRID_HEIGHT - 1 do
+			if grid [y][x] ~= firstCharacter then
+				match = false
+				break
+			end
+
+			y = y - 1
+			x = x + 1
+		end 
+		
+		if match then
+			gameOver = true
+			winningPlayer = firstCharacter == "X" and 1 or 2
 		end
 	end
 end
