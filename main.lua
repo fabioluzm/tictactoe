@@ -318,4 +318,4 @@ function checkDiagonals()
 			winningPlayer = firstCharacter == 'X' and 1 or 2
 		end
 	end
-e
+end
