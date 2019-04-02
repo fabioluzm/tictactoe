@@ -51,6 +51,7 @@ local grid = {
 	{"", "", ""}
 }
 local currentPlayer = 1
+local aiPlayer = false
 local selectedX, selectedY = 1, 1
 local winningPlayer = 0
 local gameOver = false
@@ -65,6 +66,9 @@ function love.load()
 
 	-- window game title
 	love.window.setTitle('TicTacToe')
+
+	-- generates random numbers diferently every single time
+	math.randomseed(os.time())
 
 	-- setup  game screen based on virtual resolution
 	push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
@@ -102,7 +106,13 @@ function love.keypressed(key)
 				if currentPlayer == 1 then
 					grid[selectedY][selectedX] = 'X'
 					currentPlayer = 2
+					
 					checkVictory()
+
+					if not GameOver and aiPlayer then
+						takeAITurn()
+						checkVictory()
+					end
 				else
 					grid[selectedY][selectedX] = 'O'
 					currentPlayer = 1
@@ -112,11 +122,6 @@ function love.keypressed(key)
 		end
 	end
 end
-
-function love.update(dt)
-
-end
-
 
 function love.draw()
 	push:start()
@@ -179,21 +184,56 @@ function drawGrid()
 end
 
 function checkVictory()
-		
 	checkHorizontals()
 	checkVerticals()
 	checkDiagonals()
+end
 
+function takeAITurn()
+	local tookTurn = false
+
+	-- some block of code to check if we found a gap
+	-- and then set whether we found the gap again
+	
+	-- check horizontals
+	for y = 1, GRID_HEIGHT do
+		for x = 1, GRID_WIDTH do
+			if grid[y][x] == '' then
+				grid[y][x] = 'X'
+
+				checkVictory()
+				grid[y][x] = ''
+
+				if gameOver then
+					grid[y][x] = '0'
+					gameOver = false
+					winningPlayer = ''
+					currentPlayer = 1
+					return
+				end
+			end
+		end
+	end
+
+	--choose a tile to place our "0" in randomly
+	while not tookTurn do
+		local x, y = math.random(GRID_WIDTH), math.random(GRID_HEIGHT)
+
+		if grid[y][x] == '' then
+			grid[y][x] = '0'
+			tookTurn = true
+		end
+	end
+	currentPlayer = 1
 end
 
 function checkHorizontals()
-
 	--[[ check Y horizontal rows ]]
 	for y = 1, GRID_HEIGHT do
 		local win = true
 		local firstCharacter = grid[y][1]
 
-		if firstCharacter == "" then
+		if firstCharacter == '' then
 			goto continue
 		end
 
@@ -204,19 +244,18 @@ function checkHorizontals()
 		end
 		
 		gameOver = true
-		winningPlayer = firstCharacter == "X" and 1 or 2
+		winningPlayer = firstCharacter == 'X' and 1 or 2
 		::continue::
 	end
 end
 
-function checkVerticals()
-	
+function checkVerticals()	
 	--[[ check X vertical columns ]]
 	for x = 1, GRID_WIDTH do
 		local win = true
 		local firstCharacter = grid[1][x]
 
-		if firstCharacter == "" then
+		if firstCharacter == '' then
 			goto continue
 		end
 
@@ -227,20 +266,19 @@ function checkVerticals()
 		end
 		
 		gameOver = true
-		winningPlayer = firstCharacter == "X" and 1 or 2
+		winningPlayer = firstCharacter == 'X' and 1 or 2
 		::continue::
 	end
 end
 
 function checkDiagonals()
-
 	--[[ check 2 diagonal rows ]]
 	local firstCharacter = grid[1][1]
 
 	-- from top left to bottom right
 	local match = true
-	 
-	if firstCharacter == "" then
+	  
+	if firstCharacter == '' then
 		-- do nothing
 	else
 		for diagonal = 1, GRID_HEIGHT do
@@ -252,7 +290,7 @@ function checkDiagonals()
 
 		if match then
 			gameOver = true
-			winningPlayer = firstCharacter == "X" and 1 or 2
+			winningPlayer = firstCharacter == 'X' and 1 or 2
 		end
 	end
 
@@ -260,7 +298,7 @@ function checkDiagonals()
 	local match = true
 	firstCharacter = grid[GRID_HEIGHT][1]
 
-	if firstCharacter == "" then
+	if firstCharacter == '' then
 		-- do nothing
 	else
 		local x, y = 2, 2
@@ -277,7 +315,7 @@ function checkDiagonals()
 		
 		if match then
 			gameOver = true
-			winningPlayer = firstCharacter == "X" and 1 or 2
+			winningPlayer = firstCharacter == 'X' and 1 or 2
 		end
 	end
-end
+e
